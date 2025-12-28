@@ -8,65 +8,30 @@ interface NavigationProps {
 }
 
 const Navigation: React.FC<NavigationProps> = ({ currentView, setView }) => {
-  const tabs = [
-    { 
-      id: AppView.STUDENT, 
-      label: 'ส่งงาน 🚀', 
-      activeClass: 'from-orange-400 to-red-500 border-red-600 shadow-orange-200',
-      inactiveClass: 'hover:from-orange-50 hover:to-orange-100'
-    },
-    { 
-      id: AppView.RESULT, 
-      label: 'เช็คคะแนน 🏆', 
-      activeClass: 'from-yellow-400 to-amber-500 border-amber-600 shadow-yellow-200',
-      inactiveClass: 'hover:from-yellow-50 hover:to-yellow-100'
-    },
-    { 
-      id: AppView.GALLERY, 
-      label: 'โรงหนังเพื่อน 🎬', 
-      activeClass: 'from-pink-400 to-rose-500 border-rose-600 shadow-pink-200',
-      inactiveClass: 'hover:from-pink-50 hover:to-pink-100'
-    },
-    { 
-      id: AppView.TEACHER, 
-      label: "ห้องคุณครู 📚", 
-      activeClass: 'from-indigo-500 to-purple-600 border-indigo-700 shadow-indigo-200',
-      inactiveClass: 'hover:from-indigo-50 hover:to-indigo-100'
-    },
-    { 
-      id: AppView.DASHBOARD, 
-      label: 'สรุปภาพรวม 📊', 
-      activeClass: 'from-emerald-400 to-teal-500 border-teal-600 shadow-emerald-200',
-      inactiveClass: 'hover:from-emerald-50 hover:to-emerald-100'
-    },
+  const menus = [
+    { id: AppView.STUDENT, label: 'ส่งงาน', icon: '🚀', color: 'bg-indigo-500' },
+    { id: AppView.RESULT, label: 'ตรวจคะแนน', icon: '🏆', color: 'bg-yellow-500' },
+    { id: AppView.GALLERY, label: 'โรงหนังเพื่อน', icon: '🎬', color: 'bg-pink-500' },
+    { id: AppView.TEACHER_LOGIN, label: 'คุณครู', icon: '👩‍🏫', color: 'bg-slate-700' },
+    { id: AppView.DASHBOARD, label: 'สถิติ', icon: '📊', color: 'bg-emerald-500' },
   ];
 
   return (
-    <nav className="flex flex-wrap justify-center gap-4 mb-10 w-full max-w-5xl px-4">
-      {tabs.map((tab) => {
-        const isActive = currentView === tab.id || (currentView === AppView.TEACHER_LOGIN && tab.id === AppView.TEACHER);
-        
+    <nav className="flex flex-wrap justify-center gap-3 md:gap-4 mb-10">
+      {menus.map(menu => {
+        const isActive = currentView === menu.id || (menu.id === AppView.TEACHER_LOGIN && currentView === AppView.TEACHER);
         return (
           <button
-            key={tab.id}
-            onClick={() => setView(tab.id)}
-            className={`
-              relative px-6 py-4 rounded-3xl font-bold transition-all transform 
-              active:translate-y-1 active:border-b-0
-              shadow-lg border-b-8 flex items-center justify-center gap-2
-              ${isActive 
-                ? `bg-gradient-to-br ${tab.activeClass} text-white scale-110 ring-4 ring-white/50 z-10` 
-                : `bg-white/60 text-gray-600 border-gray-200 backdrop-blur-sm ${tab.inactiveClass} hover:-translate-y-1`
-              }
-            `}
+            key={menu.id}
+            onClick={() => setView(menu.id)}
+            className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold transition-all btn-bounce border-2 ${
+              isActive 
+                ? `${menu.color} text-white scale-105 shadow-lg border-transparent` 
+                : 'bg-white/60 text-slate-500 hover:bg-white border-white/50 backdrop-blur-sm shadow-sm'
+            }`}
           >
-            <span className="text-xl">{tab.label.split(' ')[1]}</span>
-            <span className="text-lg">{tab.label.split(' ')[0]}</span>
-            
-            {/* Spotlight effect for active tab */}
-            {isActive && (
-              <div className="absolute inset-0 bg-white/20 rounded-3xl pointer-events-none opacity-50 blur-sm"></div>
-            )}
+            <span className="text-xl">{menu.icon}</span>
+            <span className="hidden sm:inline text-base">{menu.label}</span>
           </button>
         );
       })}

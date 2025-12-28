@@ -47,3 +47,10 @@ export interface GASResponse {
   fileUrl?: string;
   data?: any;
 }
+
+export interface ToastMessage {
+  id: string;
+  message: string;
+  type: 'success' | 'info' | 'warning';
+  icon?: string;
+}

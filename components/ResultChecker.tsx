@@ -1,12 +1,13 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { StudentSubmission } from '../types';
 
 interface ResultCheckerProps {
   submissions: StudentSubmission[];
+  refreshData?: () => void;
 }
 
-const ResultChecker: React.FC<ResultCheckerProps> = ({ submissions }) => {
+const ResultChecker: React.FC<ResultCheckerProps> = ({ submissions, refreshData }) => {
   const [searchNo, setSearchNo] = useState('');
   const [searchGrade, setSearchGrade] = useState('Prathom 5');
   const [searchRoom, setSearchRoom] = useState('Room 1');
@@ -20,6 +21,31 @@ const ResultChecker: React.FC<ResultCheckerProps> = ({ submissions }) => {
       s.room === searchRoom
     );
   }, [submissions, searchNo, searchGrade, searchRoom, hasSearched]);
+
+  // If student is waiting for result, refresh data every 20 seconds
+  useEffect(() => {
+    let interval: number;
+    if (hasSearched && result && !result.review && refreshData) {
+      interval = window.setInterval(() => {
+        refreshData();
+      }, 20000);
+    }
+    return () => clearInterval(interval);
+  }, [hasSearched, result, refreshData]);
+
+  // Notify student if review just arrived
+  const prevReviewRef = React.useRef(result?.review);
+  useEffect(() => {
+    if (result?.review && !prevReviewRef.current && hasSearched) {
+      if ("Notification" in window && Notification.permission === 'granted') {
+        new Notification("คุณครูตรวจงานให้แล้วจ้า!", {
+          body: `หนูได้คะแนน ${result.review.totalScore}/20 จ๊ะ! เก่งมาก`,
+          icon: 'https://img2.pic.in.th/-23.png'
+        });
+      }
+    }
+    prevReviewRef.current = result?.review;
+  }, [result?.review, hasSearched]);
 
   return (
     <div className="max-w-2xl mx-auto space-y-8 py-4">
@@ -88,6 +114,11 @@ const ResultChecker: React.FC<ResultCheckerProps> = ({ submissions }) => {
               <p className="text-6xl mb-4">🎬</p>
               <p className="text-2xl text-blue-600 font-bold">คุณครูได้รับวิดีโอแล้ว!</p>
               <p className="text-blue-400 font-bold mt-2">กำลังรอคุณครูตรวจอยู่นะจ๊ะ อดใจรออีกนิดเดียว ✨</p>
+              <div className="mt-4 flex items-center justify-center gap-2">
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce [animation-delay:-0.1s]"></div>
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce [animation-delay:-0.2s]"></div>
+              </div>
             </div>
           ) : (
             <div className="bg-white p-10 rounded-[4rem] border-8 border-green-200 shadow-2xl relative overflow-hidden">
@@ -95,11 +126,11 @@ const ResultChecker: React.FC<ResultCheckerProps> = ({ submissions }) => {
               <h3 className="text-3xl font-kids text-green-600 mb-6">เก่งมากเลย {result.name}!</h3>
               
               <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="bg-green-50 p-6 rounded-3xl text-center">
+                <div className="bg-green-50 p-6 rounded-3xl text-center shadow-inner">
                   <p className="text-xs font-bold text-green-400 uppercase">คะแนนที่ได้</p>
                   <p className="text-5xl font-kids text-green-600">{result.review.totalScore}/20</p>
                 </div>
-                <div className="bg-green-50 p-6 rounded-3xl text-center">
+                <div className="bg-green-50 p-6 rounded-3xl text-center shadow-inner">
                   <p className="text-xs font-bold text-green-400 uppercase">คิดเป็นร้อยละ</p>
                   <p className="text-5xl font-kids text-green-600">{result.review.percentage}%</p>
                 </div>

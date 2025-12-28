@@ -11,8 +11,9 @@
   "dependencies": {
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
-    "@google/genai": "latest",
-    "chart.js": "latest"
+    "@google/genai": "0.2.0",
+    "chart.js": "latest",
+    "canvas-confetti": "1.9.3"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
